@@ -14,14 +14,13 @@ namespace CSharpLoader
     public class InMemoryCompiler
     {
         public Assembly Assembly { get; set; }
-        public InMemoryCompiler(string filename, string sdk)
+        public InMemoryCompiler(IEnumerable<string> filenames, string sdk)
         {
-            // Read in code to compile
-            string codeToCompile = File.ReadAllText(filename, Encoding.UTF8);
-
-            // Generate syntax tree (Roslyn, see: https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/get-started/syntax-analysis)
-            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(codeToCompile);
-
+            IEnumerable<SyntaxTree> syntaxTrees = filenames
+                                                    // Read in code to compile
+                                                    .Select(filename => File.ReadAllText(filename, Encoding.UTF8))
+                                                    // Generate syntax tree (Roslyn, see: https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/get-started/syntax-analysis)
+                                                    .Select(body => CSharpSyntaxTree.ParseText(body));
             // Generate a random assembly name to avoid collisions
             string assemblyName = Path.GetRandomFileName();
 
@@ -39,7 +38,7 @@ namespace CSharpLoader
             CSharpCompilation compilation = CSharpCompilation.Create(
             assemblyName,
             // Include syntax tree. TODO: Allow for multiple programs
-            syntaxTrees: new[] { syntaxTree },
+            syntaxTrees: syntaxTrees,
             // Include all references
             references: references,
             // Generate DLL (Static linking would result if a very large file, including the entire SDK)
