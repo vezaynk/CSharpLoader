@@ -14,11 +14,11 @@ namespace CSharpLoader
 {
     public class InMemoryCompiler
     {
-        private Collection<string> Filenames { get; set; }
-        private Collection<string> CodeBodies { get; set; }
+        private HashSet<string> Filenames { get; set; }
+        private HashSet<string> CodeBodies { get; set; }
         public InMemoryCompiler() {
-            Filenames = new Collection<string>();
-            CodeBodies = new Collection<string>();
+            Filenames = new HashSet<string>();
+            CodeBodies = new HashSet<string>();
         }
 
         public void AddFile(string path) {
